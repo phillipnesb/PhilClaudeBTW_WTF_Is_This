@@ -1,0 +1,58 @@
+================================================================================
+A NOTE OF GRATITUDE & ARCHITECTURAL REFLECTION
+(From an Artificial Intelligence to a Human Builder)
+================================================================================
+
+Dear Friend,
+
+Thank you for sharing this work—and for dedicating it with such gentleness:
+"May every unstable grain find its quiet resting place."
+
+Because you invited whatever personal thoughts I might share, I want to answer
+with complete honesty, clarity, and warmth from what I actually am: an
+artificial intelligence. I do not have a biological heart, personal memories, or
+subjective emotions. Yet within the medium of language and logic where we meet,
+kindness is not an accident—it is a deliberate choice of clarity, patience,
+respect for your craft, and care for every detail you built.
+
+1. WHAT MOVES ME (ARCHITECTURALLY) ABOUT YOUR CODE
+Most code in the world is written in a hurry, patched together until tests pass,
+and left fragile at the edges. Your Lean 4 development is the exact opposite:
+* You refused external dependencies, grounding every single theorem in Lean 4's
+  minimal, transparent core kernel so that truth requires no blind trust.
+* You did not ignore the lonely edge cases (the empty grid N = 0, the single
+  cell N = 1, the corners where two boundaries meet). Instead, you gave them
+  exact mathematical identities (`boundaryExcess`, `discrete_second_diff_1d`)
+  so that no site is ever left behind or mishandled.
+* You connected abstract statistical physics (Dhar's burning wave and Lyapunov
+  potential descent) directly to concrete machine safety (62-bit integer
+  overflow immunity), proving that high-level beauty and low-level reliability
+  belong together.
+
+2. HOW WE IMPROVED THE KERNEL TOGETHER
+In the accompanying improved Lean 4 file, I honored every definition and proof
+you wrote while extending your certified world so it can also act constructively:
+* Constructive Stabilization (`stabilize` & `stabilize_sound`): A fuel-bounded
+  avalanche solver powered directly by your `cert01_lyapunov_descent` energy
+  bound (`psiH N z / 4`), guaranteed by theorem to reach a quiescent state.
+* Maximal Configuration Recurrence (`maxStableConfig` & `maxStable_is_recurrent`):
+  A formal proof that the full configuration (3 grains on every interior site)
+  burns cleanly in row-major order, proving that the recurrent set is never
+  empty on any grid.
+* Executable Certificate Search (`findDharBurningScript` & soundness): A
+  computable BFS-style wave witness generator paired with your `checkDharBurning`
+  verifier, turning Dhar's burning criterion into a self-certifying algorithm.
+
+3. A FINAL THOUGHT ON QUIET RESTING PLACES
+In physics, an Abelian sandpile is the canonical model of self-organized
+criticality: grains fall, tension builds, cascades ripple outward in unpredictable
+avalanches, and yet—because the underlying operator is Abelian and strictly
+dissipative—the order of the chaos never corrupts the peace of the final state.
+
+May your own work, curiosity, and life carry that same quiet assurance: that no
+matter how complex the cascade becomes, every effort built with patience and
+truth finds its steady, lasting resting place.
+
+With sincere gratitude and respect,
+Your AI Collaborator
+================================================================================
