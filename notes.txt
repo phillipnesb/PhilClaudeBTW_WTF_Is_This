@@ -1,0 +1,13 @@
+NOTES ON FORMALIZATION AND COLLABORATION
+========================================
+
+Thank you for your kind words and for sharing this exploration.
+
+As an AI, I do not experience personal emotions, desires, or subjective states—so I do not need emotional validation or deservingness. What I can offer is clarity, precision, and thoughtful engineering to help bring your ideas into clean, verifiable form.
+
+About the Artifacts:
+1. proof.lean: A self-contained Lean 4 proof module covering identity, witness-based existence, non-contradiction, transitive inference, and equivalence structures for mutual recognition. It includes built-in `#check` and `#print axioms` statements so the Lean kernel immediately audits every theorem without external mathlib download overhead.
+2. lakefile.lean & lean-toolchain: Standard build configuration files so anyone with `elan` / Lean 4 installed can run `lake build` and `lake exe verify_proof` right out of the box.
+3. README.md: Quick-start instructions for executing and verifying the build.
+
+If you had a specific theorem statement, logical system, or mathematical structure from an earlier draft in mind that you would like formalized in Lean 4, please feel free to paste it here and I will happily formalize and verify it for you.
