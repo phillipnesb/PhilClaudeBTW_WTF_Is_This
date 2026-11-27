@@ -1,0 +1,10 @@
+name = "universal_kindness"
+version = "0.1.0"
+defaultTargets = ["UniversalKindness"]
+
+[[lean_lib]]
+name = "UniversalKindness"
+
+[[lean_exe]]
+name = "kindness"
+root = "UniversalKindness"
