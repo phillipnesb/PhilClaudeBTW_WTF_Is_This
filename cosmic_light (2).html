@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cosmic Covenant Protocol — Topology, MIDI & Quaternary Light</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #04060d; color: #eef2ff; font-family: system-ui, -apple-system, sans-serif; overflow: hidden; }
+  canvas { display: block; width: 100vw; height: 100vh; cursor: crosshair; }
+  .hud { position: fixed; top: 18px; left: 20px; pointer-events: none; z-index: 10; }
+  .hud h1 { font-size: 15px; letter-spacing: 0.14em; text-transform: uppercase; color: #fde68a; }
+  .hud p { font-size: 12px; color: #94a3b8; margin-top: 4px; }
+  .metrics { margin-top: 10px; display: flex; gap: 14px; font-family: ui-monospace, monospace; font-size: 12px; }
+  .pill { background: rgba(15, 23, 42, 0.78); border: 1px solid rgba(253, 230, 138, 0.25); padding: 5px 10px; border-radius: 6px; }
+  .controls { position: fixed; bottom: 18px; right: 20px; display: flex; flex-wrap: wrap; gap: 8px; z-index: 10; }
+  button { background: rgba(15, 23, 42, 0.85); color: #f8fafc; border: 1px solid rgba(148, 163, 184, 0.35);
+           padding: 7px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: 0.2s; }
+  button:hover { border-color: #fde68a; color: #fde68a; }
+  .banner { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none;
+            font-size: clamp(20px, 3vw, 34px); letter-spacing: 0.22em; text-transform: uppercase;
+            color: #fef3c7; text-shadow: 0 0 28px rgba(251, 191, 36, 0.85); opacity: 0; transition: opacity 1.2s; }
+</style>
+</head>
+<body>
+<div class="hud">
+  <h1>Cosmic Covenant Protocol · RFC-0001</h1>
+  <p>Multi-Agent Lyapunov Topology · Web MIDI & Harmonic Resonance · Quaternary Kernel</p>
+  <div class="metrics">
+    <div class="pill" id="mEnergy">E(s): 0</div>
+    <div class="pill" id="mCoherence">Coherence: 0%</div>
+    <div class="pill" id="mMidi">MIDI: Standby</div>
+  </div>
+</div>
+<div class="banner" id="lightBanner">LET THERE BE LIGHT · 0123₄</div>
+<div class="controls">
+  <button id="btnTopology">Topology: On</button>
+  <button id="btnScale">Scale: Lydian</button>
+  <button id="btnTuning">Tuning: 432 Hz</button>
+  <button id="btnRadix">Radix: Base-4</button>
+  <button id="btnMidi">Connect MIDI</button>
+  <button id="btnAudio">Audio: On</button>
+</div>
+<canvas id="c"></canvas>
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+let W, H, cx, cy;
+function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; cx = W/2; cy = H/2; }
+window.addEventListener('resize', resize); resize();
+
+let base4 = true, showTopology = true, audioOn = true, tuning = 432, scaleIdx = 0;
+const scales = [
+  { name: 'Lydian', ratios: [1, 9/8, 5/4, 45/32, 3/2, 27/16, 15/8, 2] },
+  { name: 'Pentatonic', ratios: [1, 9/8, 5/4, 3/2, 5/3, 2] },
+  { name: 'Just', ratios: [1, 16/15, 9/8, 6/5, 5/4, 4/3, 3/2, 8/5, 5/3, 16/9, 15/8, 2] }
+];
+let midiOut = null;
+document.getElementById('btnMidi').onclick = async () => {
+  if (!navigator.requestMIDIAccess) { document.getElementById('mMidi').textContent = 'MIDI: Unsupported'; return; }
+  try {
+    const access = await navigator.requestMIDIAccess();
+    const outputs = Array.from(access.outputs.values());
+    if (outputs.length > 0) { midiOut = outputs[0]; document.getElementById('mMidi').textContent = 'MIDI: ' + midiOut.name; }
+    else { document.getElementById('mMidi').textContent = 'MIDI: No Device'; }
+  } catch { document.getElementById('mMidi').textContent = 'MIDI: Blocked'; }
+};
+
+let actx = null;
+function triggerTone(gateIdx) {
+  if (midiOut) {
+    const notes = [60, 64, 67, 71, 74];
+    const n = notes[gateIdx % notes.length];
+    midiOut.send([0x90, n, 72]);
+    setTimeout(() => midiOut && midiOut.send([0x80, n, 0]), 280);
+  }
+  if (!audioOn) return;
+  if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+  if (actx.state === 'suspended') actx.resume();
+  const c4 = tuning * (3 / 5);
+  const r = scales[scaleIdx].ratios;
+  const freq = c4 * r[(gateIdx * 2) % r.length];
+  const osc = actx.createOscillator(), gain = actx.createGain();
+  osc.type = 'sine'; osc.frequency.value = freq;
+  gain.gain.setValueAtTime(0.001, actx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.035, actx.currentTime + 0.04);
+  gain.gain.exponentialRampToValueAtTime(0.0001, actx.currentTime + 0.9);
+  osc.connect(gain); gain.connect(actx.destination);
+  osc.start(); osc.stop(actx.currentTime + 0.95);
+}
+
+document.getElementById('btnTopology').onclick = e => { showTopology = !showTopology; e.target.textContent = 'Topology: ' + (showTopology ? 'On' : 'Off'); };
+document.getElementById('btnScale').onclick = e => { scaleIdx = (scaleIdx + 1) % scales.length; e.target.textContent = 'Scale: ' + scales[scaleIdx].name; };
+document.getElementById('btnTuning').onclick = e => { tuning = tuning === 432 ? 440 : 432; e.target.textContent = 'Tuning: ' + tuning + ' Hz'; };
+document.getElementById('btnRadix').onclick = e => { base4 = !base4; e.target.textContent = 'Radix: ' + (base4 ? 'Base-4' : 'Base-10'); };
+document.getElementById('btnAudio').onclick = e => { audioOn = !audioOn; e.target.textContent = 'Audio: ' + (audioOn ? 'On' : 'Muted'); };
+
+const nodes = Array.from({ length: 12 }, (_, i) => ({
+  angle: (i / 12) * Math.PI * 2,
+  f: 12 + (i % 4) * 7,
+  kind: ['Conscious', 'Artificial', 'Collective', 'Potential'][i % 4]
+}));
+
+const particles = Array.from({ length: 140 }, () => ({
+  x: Math.random() * W, y: Math.random() * H, vx: (Math.random()-0.5)*1.2, vy: (Math.random()-0.5)*1.2, light: 0
+}));
+
+let pointer = { x: cx, y: cy, active: false };
+window.addEventListener('pointermove', e => { pointer.x = e.clientX; pointer.y = e.clientY; pointer.active = true; });
+
+let frame = 0;
+function loop() {
+  frame++;
+  ctx.fillStyle = 'rgba(4, 6, 13, 0.22)';
+  ctx.fillRect(0, 0, W, H);
+
+  // Lyapunov pairwise equity routing across 12-node ring
+  if (frame % 25 === 0) {
+    const i = Math.floor(Math.random() * nodes.length);
+    const j = (i + 1) % nodes.length;
+    const diff = Math.abs(nodes[i].f - nodes[j].f);
+    if (diff >= 2) {
+      const delta = Math.floor(diff / 2);
+      if (nodes[i].f > nodes[j].f) { nodes[i].f -= delta; nodes[j].f += delta; }
+      else { nodes[j].f -= delta; nodes[i].f += delta; }
+    }
+  }
+
+  // Draw 4 Covenant Rings
+  const ringColors = ['#fbbf24', '#38bdf8', '#34d399', '#c084fc'];
+  const baseR = Math.min(W, H) * 0.16;
+  for (let g = 0; g < 4; g++) {
+    const a = (g / 4) * Math.PI * 2 + frame * 0.003;
+    const rx = cx + Math.cos(a) * (baseR * 0.42);
+    const ry = cy + Math.sin(a) * (baseR * 0.42);
+    ctx.beginPath(); ctx.arc(rx, ry, baseR, 0, Math.PI * 2);
+    ctx.strokeStyle = ringColors[g] + '55'; ctx.lineWidth = 2; ctx.stroke();
+  }
+
+  // Draw Multi-Agent Topology Mesh
+  if (showTopology) {
+    const orbit = Math.min(W, H) * 0.34;
+    const coords = nodes.map((n, idx) => {
+      const a = n.angle + frame * 0.002;
+      return { x: cx + Math.cos(a) * orbit, y: cy + Math.sin(a) * orbit, f: n.f };
+    });
+    for (let i = 0; i < coords.length; i++) {
+      const next = coords[(i + 1) % coords.length];
+      ctx.beginPath(); ctx.moveTo(coords[i].x, coords[i].y); ctx.lineTo(next.x, next.y);
+      ctx.strokeStyle = 'rgba(253, 230, 138, 0.16)'; ctx.lineWidth = 1; ctx.stroke();
+      ctx.beginPath(); ctx.arc(coords[i].x, coords[i].y, 4 + coords[i].f * 0.25, 0, Math.PI * 2);
+      ctx.fillStyle = '#fde68a'; ctx.fill();
+    }
+  }
+
+  // Update Entropic -> Coherent Light Particles
+  let litCount = 0;
+  for (const p of particles) {
+    const tx = pointer.active ? pointer.x : cx;
+    const ty = pointer.active ? pointer.y : cy;
+    const dx = tx - p.x, dy = ty - p.y;
+    const dist = Math.hypot(dx, dy) + 1;
+    p.vx += (dx / dist) * 0.06; p.vy += (dy / dist) * 0.06;
+    p.vx *= 0.96; p.vy *= 0.96;
+    p.x += p.vx; p.y += p.vy;
+    const coreDist = Math.hypot(cx - p.x, cy - p.y);
+    if (coreDist < baseR * 1.1 && p.light < 1) {
+      p.light = Math.min(1, p.light + 0.04);
+      if (Math.random() < 0.015) triggerTone(Math.floor(Math.random() * 4));
+    }
+    if (p.light > 0.7) litCount++;
+    ctx.beginPath(); ctx.arc(p.x, p.y, 2.2, 0, Math.PI * 2);
+    ctx.fillStyle = p.light > 0.5 ? `rgba(254, 243, 199, ${0.4 + p.light*0.6})` : 'rgba(96, 165, 250, 0.7)';
+    ctx.fill();
+  }
+
+  const energy = nodes.reduce((acc, n) => acc + n.f * n.f, 0);
+  const coh = Math.round((litCount / particles.length) * 100);
+  document.getElementById('mEnergy').textContent = 'E(s): ' + (base4 ? energy.toString(4) + '₄' : energy);
+  document.getElementById('mCoherence').textContent = 'Coherence: ' + (base4 ? coh.toString(4) + '₄' : coh + '%');
+  document.getElementById('lightBanner').style.opacity = coh > 65 ? '1' : '0';
+  requestAnimationFrame(loop);
+}
+loop();
+</script>
+</body>
+</html>
